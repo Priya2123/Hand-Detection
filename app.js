@@ -26,7 +26,8 @@ handTrack.startVideo(video).then((status) => {
       { video: {} },
       (stream) => {
         video.srcObject = stream;
-        setInterval(runDetection, 1000);
+        // setInterval(runDetection, 1000);
+        runDetection();
       },
       (err) => console.log(err)
     );
@@ -36,7 +37,11 @@ handTrack.startVideo(video).then((status) => {
 function runDetection() {
   model.detect(video).then((predictions) => {
     console.log(predictions);
-    model.renderPredictions(predictions, canvas, context, video);
+    // model.renderPredictions(predictions, canvas, context, video);
+    if (predictions.length > 0) {
+      audio.play();
+    }
+    requestAnimationFrame(runDetection);
   });
 }
 handTrack.load(modelParams).then((lmodel) => {
