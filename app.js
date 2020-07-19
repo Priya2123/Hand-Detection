@@ -1,3 +1,11 @@
+const modelParams = {
+  flipHorizontal: true, // flip e.g for video
+  imageScaleFactor: 0.7, // reduce input image size for gains in speed.
+  maxNumBoxes: 20, // maximum number of boxes to detect
+  iouThreshold: 0.5, // ioU threshold for non-max suppression
+  scoreThreshold: 0.79, // confidence threshold for predictions.
+};
+
 navigator.getUserMedia =
   navigator.getUserMedia ||
   navigator.webkitGetUserMedia ||
@@ -7,7 +15,7 @@ navigator.getUserMedia =
 const video = document.querySelector("#video");
 const audio = document.querySelector("#audio");
 const canvas = document.querySelector("#canvas");
-const canvas = canvas.getContext("2d");
+const context = canvas.getContext("2d");
 
 //detects your hand (trained)
 let model;
@@ -18,11 +26,19 @@ handTrack.startVideo(video).then((status) => {
       { video: {} },
       (stream) => {
         video.srcObject = stream;
+        setInterval(runDetection, 1000);
       },
       (err) => console.log(err)
     );
   }
 });
-handTrack.load().then((lmodel) => {
+
+function runDetection() {
+  model.detect(video).then((predictions) => {
+    console.log(predictions);
+    model.renderPredictions(predictions, canvas, context, video);
+  });
+}
+handTrack.load(modelParams).then((lmodel) => {
   model = lmodel;
 });
